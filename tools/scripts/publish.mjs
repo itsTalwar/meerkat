@@ -22,7 +22,17 @@ function invariant(condition, message) {
 
 // Executing publish script: node path/to/publish.mjs {name} --version {version} --tag {tag}
 // Default "tag" to "next" so we won't publish the "latest" tag by accident.
-const [, , name, version, tag = 'next'] = process.argv;
+const [, , name, tag = 'next', releaseType] = process.argv;
+
+// Read version from package.json
+let version;
+try {
+  const packageJson = JSON.parse(readFileSync('package.json').toString());
+  version = packageJson.version;
+} catch (error) {
+  console.error('Failed to read version from package.json:', error);
+  process.exit(1);
+}
 
 // A simple SemVer validation to validate the version
 const validVersion = /^\d+\.\d+\.\d+(-\w+\.\d+)?/;
